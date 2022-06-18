@@ -1,0 +1,13 @@
+# build: <path-of-Dockerfile>
+# image: <name-image-dockerhub>
+
+version: "3"
+services:
+  server:
+    container_name: server
+    image: server-image
+    ports:
+      - "5003:5003"
+    build:
+      context: ./
+      dockerfile: Dockerfile
