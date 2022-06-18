@@ -4,6 +4,7 @@ import pandas as pd
 from Crypto.Cipher import AES
 from Crypto.Hash import MD5
 import os
+from memory_profiler import profile
 
 def check_server():
     return 'sucesso :)'
@@ -32,6 +33,7 @@ def search_index(document, trapdoor):
     # print time.time() - start_time
     return search_result
 
+@profile
 def get_index_of(keywords):
     keyword = ""
     for w in keywords:

@@ -1,2 +1,3 @@
-Faker==13.12.1
-pandas==1.4.1
+Faker
+pandas
+cryptography
