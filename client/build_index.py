@@ -6,7 +6,6 @@ import numpy as np
 import time
 import os
 
-
 def build_trapdoor(MK, keyword):
     keyword_index = MD5.new()
     keyword_index.update(str(keyword).encode())
@@ -49,7 +48,7 @@ def searchable_encryption(raw_data_file_name, master_key, keyword_type_list):
         document_index.append(record_index)
 
     time_cost = time.time() - start_time
-    print(time_cost)
+    # print(time_cost)
     document_index_dataframe = pd.DataFrame(np.array(document_index), columns=index_header)
     document_index_dataframe.to_csv(raw_data_file_name.split(".")[0] + "_index.csv")
 
@@ -71,7 +70,6 @@ if __name__ == "__main__":
     
     searchable_encryption(document_name, master_key, keyword_type_list)
 
-    print("Finished")
-
+    # print("Finished")
 
     os.chdir('../client/')

@@ -29,111 +29,94 @@ def get_search_set(dataset, k):
     return words
 
 if __name__ == '__main__':
+    # erase files
+    try:
+        os.remove("plot/execution_time.txt")
+    except:
+        pass
+    try:
+        os.remove("plot/cpu.txt")
+    except:
+        pass
+    try:
+        os.remove("plot/memory.txt")
+    except:
+        pass
+
+    # init variables
     seed(123)
     Faker.seed(123)
     fake = Faker()
 
-    size, last, offset, search_size = [], 100, 500, [10, 20, 30, 40]
-    for i in range(1):
-        size.append(last)
-        last += offset
+    number_of_columns, size, offset, number_of_queries_per_dataset, dataset_size = 10, 100, 500, [10, 20, 30, 40], []
+    for i in range(7):
+        dataset_size.append(size)
+        size += offset
 
-    time_info_x, time_info_y = [], []
-    memo_info_x, memo_info_y = [], []
-    cpu_info_x, cpu_info_y = [], []
-    label = []
+    number_of_rounds = 30
+    for round in range(number_of_rounds):
+        for number_of_queries in number_of_queries_per_dataset:
+            y_cpu, y_mem, y_time, x = [], [], [], []
+            for size in tqdm(dataset_size):
+                
+                dataset = create_dataset(size, number_of_columns, fake)
+                queries = get_search_set(dataset, number_of_queries)
 
-    APGAR = False
+                # write dataset and columns in the datasets directory
+                os.chdir('../datasets/')
+                dataset.to_csv('Database.csv', na_rep='Unkown')
+                with open(r'keywordlist', 'w') as fp:
+                    column_names = list(dataset.columns.values.tolist())
+                    flag = False
+                    for item in column_names:
+                        if flag == True:
+                            fp.write(",%s" % item)
+                        else:
+                            fp.write("%s" % item)
+                        flag = True
+                os.chdir('../client/')
 
-    for string_size in search_size:
-        x, y = [], []
-        y_cpu, y_mem = [], []
+                # build index with encrypted data
+                os.system("python3 build_index.py")
+                
+                # run the generated queries
+                start_time = time.time()
+                for i in range(len(queries)):
+                    query = {'keyword': queries[i]}
+                    response = requests.get('http://127.0.0.1:5003/search', json=query)
+                total_time = time.time() - start_time
 
-        for sz in size:
-            
-            dataset = create_dataset(sz, 10, fake)
-            words = get_search_set(dataset, string_size)
+                y_mem.append(psutil.virtual_memory()[2])
+                y_cpu.append(psutil.cpu_percent(0.5))
+                y_time.append(total_time)
+                x.append(size)
+                
+                # erase all generated files in the dataset directory
+                dir = '../datasets/'
+                for f in os.listdir(dir):
+                    os.remove(os.path.join(dir, f))
 
-            os.chdir('../datasets/')
-            dataset.to_csv('Database.csv', na_rep='Unkown')
-            with open(r'keywordlist', 'w') as fp:
-                column_names = list(dataset.columns.values.tolist())
-                flag = False
-                for item in column_names:
-                    if flag == True:
-                        fp.write(",%s" % item)
-                    else:
-                        fp.write("%s" % item)
-                    flag = True
+            # write data in files
+            with open('plot/execution_time.txt', 'a') as f:
+                for i in range(len(x)):
+                    f.write("%s " % x[i])
+                f.write("%s" % '\n')
+                for i in range(len(y_time)):
+                    f.write("%s " % y_time[i])
+                f.write("%s" % '\n')
 
-            os.chdir('../client/')
-            os.system("python3 build_index.py")
-            start_time = time.time()
+            with open('plot/cpu.txt', 'a') as f:
+                for i in range(len(x)):
+                    f.write("%s " % x[i])
+                f.write("%s" % '\n')
+                for i in range(len(y_cpu)):
+                    f.write("%s " % y_cpu[i])
+                f.write("%s" % '\n')
 
-            for i in tqdm(range(len(words))):
-                if APGAR == True:
-                    continue
-                query = {'keyword': words[i]}
-                response = requests.get('http://127.0.0.1:5003/search', json=query)
-                APGAR = True
-            total_time = time.time() - start_time
-            y_mem.append(psutil.virtual_memory()[2])
-            y_cpu.append(psutil.cpu_percent(0.5))
-            x.append(sz)
-            y.append(total_time)
-            
-            dir = '../datasets/'
-            for f in os.listdir(dir):
-                os.remove(os.path.join(dir, f))
-
-        memo_info_x.append(x.copy())
-        cpu_info_x.append(x.copy())
-        memo_info_y.append(y_mem.copy())
-        cpu_info_y.append(y_cpu.copy())
-        time_info_x.append(x.copy())
-        time_info_y.append(y.copy())
-        label.append('sse-search-' + str(string_size))
-
-    #plot
-
-    color = ['chartreuse', 'orange', 'firebrick', 'blue', 'violet']
-    marker = ['^', '*', '.', 'o']
-
-    for i in range(len(memo_info_x)):
-        plt.plot(time_info_x[i], time_info_y[i], color=color[i], marker=marker[i], label=label[i])
-
-    plt.ylabel('Time (s)')
-    plt.xlabel('Number of Queries')
-    plt.title('SSE Search Results')
-    plt.legend()
-    plt.savefig('frida_time' + '.pdf')
-
-    fig = plt.figure()
-    plt.figure().clear()
-    plt.close()
-    plt.cla()
-    plt.clf()
-
-    for i in range(len(memo_info_x)):
-        plt.plot(memo_info_x[i], memo_info_y[i], color=color[i], marker=marker[i], label=label[i])
-
-    plt.ylabel('Memory (%)')
-    plt.xlabel('Number of Queries')
-    plt.title('Memory Consumption')
-    plt.legend()
-    plt.savefig('frida_memory' + '.pdf')
-
-    fig = plt.figure()
-    plt.figure().clear()
-    plt.close()
-    plt.cla()
-    plt.clf()
-
-    for i in range(len(cpu_info_x)):
-        plt.plot(cpu_info_x[i], cpu_info_y[i], color=color[i], marker=marker[i], label=label[i])
-
-    plt.ylabel('CPU (%)')
-    plt.xlabel('Number of Queries')
-    plt.title('CPU Consumption')
-    plt.legend()
-    plt.savefig('frida_cpu' + '.pdf')
+            with open('plot/memory.txt', 'a') as f:
+                for i in range(len(x)):
+                    f.write("%s " % x[i])
+                f.write("%s" % '\n')
+                for i in range(len(y_mem)):
+                    f.write("%s " % y_mem[i])
+                f.write("%s" % '\n')
