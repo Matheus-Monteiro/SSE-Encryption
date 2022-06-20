@@ -12,21 +12,22 @@ from matplotlib.pyplot import figure
 import psutil
 
 def create_dataset(num_of_rows, number_of_columns, faker):
-    dataset = []
+    dataset, words = [], []
     for row in range(num_of_rows):
         line = []
         for col in range(number_of_columns):
-            line.append(faker.name())
+            name = faker.name()
+            line.append(name)
+            words.append(name)
         dataset.append(line)
-    return pd.DataFrame(dataset)
+    return pd.DataFrame(dataset), pd.unique(words).tolist()
 
-def get_search_set(dataset, k):
-    words = []
+def get_search_set(k, words):
+    words_search = []
     for i in range(k):
-        row = randint(1, dataset.shape[0] - 1)
-        col = randint(1, dataset.shape[1]) - 1
-        words.append( dataset.iloc[row, col] )
-    return words
+        idx = randint(0, len(words) - 1)
+        words_search.append( words[idx] )
+    return words_search
 
 if __name__ == '__main__':
     # erase files
@@ -48,19 +49,19 @@ if __name__ == '__main__':
     Faker.seed(123)
     fake = Faker()
 
-    number_of_columns, size, offset, number_of_queries_per_dataset, dataset_size = 10, 100, 500, [10, 20, 30, 40], []
-    for i in range(7):
+    number_of_columns, size, offset, number_of_queries_per_dataset, dataset_size = 10, 100, 100, [100, 200, 300, 400], []
+    for i in range(5):
         dataset_size.append(size)
         size += offset
 
-    number_of_rounds = 30
+    number_of_rounds = 32
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
             for size in tqdm(dataset_size):
                 
-                dataset = create_dataset(size, number_of_columns, fake)
-                queries = get_search_set(dataset, number_of_queries)
+                dataset, words = create_dataset(size, number_of_columns, fake)
+                queries = get_search_set(number_of_queries, words)
 
                 # write dataset and columns in the datasets directory
                 os.chdir('../datasets/')
