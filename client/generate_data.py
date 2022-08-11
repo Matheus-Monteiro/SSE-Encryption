@@ -10,6 +10,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import psutil
+import sqlite3
 
 def create_dataset(num_of_rows, number_of_columns, faker):
     dataset, words = [], []
@@ -49,7 +50,6 @@ if __name__ == '__main__':
     Faker.seed(123)
     fake = Faker()
 
-
     dataset_size = [125, 250, 500, 1000, 2000, 4000]
     number_of_columns = 10
     number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
@@ -65,16 +65,24 @@ if __name__ == '__main__':
 
                 # write dataset and columns in the datasets directory
                 os.chdir('../datasets/')
-                dataset.to_csv('Database.csv', na_rep='Unkown')
-                with open(r'keywordlist', 'w') as fp:
-                    column_names = list(dataset.columns.values.tolist())
-                    flag = False
-                    for item in column_names:
-                        if flag == True:
-                            fp.write(",%s" % item)
-                        else:
-                            fp.write("%s" % item)
-                        flag = True
+                
+                table_name = 'SSE_sql_test'
+                connection = sqlite3.connect('Database.db')
+                cursor = connection.cursor()
+                dataset.to_sql(table_name, connection, if_exists='replace', index=False)
+
+                # dataset.to_csv('Database.csv', na_rep='Unkown')
+                # with open(r'keywordlist', 'w') as fp:
+                #    column_names = list(dataset.columns.values.tolist())
+                #    flag = False
+                #    for item in column_names:
+                #        if flag == True:
+                #           fp.write(",%s" % item)
+                #        else:
+                #            fp.write("%s" % item)
+                #        flag = True
+
+                connection.commit()
                 os.chdir('../client/')
 
                 # build index with encrypted data
@@ -121,3 +129,5 @@ if __name__ == '__main__':
                 for i in range(len(y_mem)):
                     f.write("%s " % y_mem[i])
                 f.write("%s" % '\n')
+
+    cursor.close()

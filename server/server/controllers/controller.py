@@ -1,3 +1,4 @@
+from sys import flags
 from server import app
 from flask import Flask, request, jsonify
 import json
@@ -17,4 +18,16 @@ def check():
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     keywords = request.json['keyword']
+
+    # print(10 * "#")
+    # print(keywords)
+    # print(10 * "#")
+    # print(10 * "#", flush=True)
+    # search_result = dict()
+    # response = {'index': search_result}
+    
+    print(os.getcwd())
+    
+    # return response
+    
     return get_index_of(keywords)
