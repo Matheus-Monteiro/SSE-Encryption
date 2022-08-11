@@ -49,10 +49,10 @@ if __name__ == '__main__':
     Faker.seed(123)
     fake = Faker()
 
-    number_of_columns, size, offset, number_of_queries_per_dataset, dataset_size = 10, 100, 100, [100, 200, 300, 400], []
-    for i in range(5):
-        dataset_size.append(size)
-        size += offset
+
+    dataset_size = [125, 250, 500, 1000, 2000, 4000]
+    number_of_columns = 10
+    number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
 
     number_of_rounds = 1
     for round in range(number_of_rounds):

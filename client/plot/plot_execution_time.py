@@ -7,7 +7,7 @@ with open('execution_time.txt') as f:
 
 def get_y__measurements(id):
     y = []
-    for i in range(id, len(lines), 8):
+    for i in range(id, len(lines), 20):
         y.append(np.array(list(map(float, lines[i][0:-1].split()))))
     return np.array(y)
 
@@ -33,15 +33,28 @@ y_time_sse1 = get_y__measurements(1)
 y_time_sse2 = get_y__measurements(3)
 y_time_sse3 = get_y__measurements(5)
 y_time_sse4 = get_y__measurements(7)
+y_time_sse5 = get_y__measurements(9)
+y_time_sse6 = get_y__measurements(11)
+y_time_sse7 = get_y__measurements(13)
+y_time_sse8 = get_y__measurements(15)
+y_time_sse9 = get_y__measurements(17)
+y_time_sse10 = get_y__measurements(19)
 
-color = ['chartreuse', 'orange', 'firebrick', 'blue']
-marker = ['^', '*', '.', 'o']
-label = ['sse-search-1', 'sse-search-2', 'sse-search-3', 'sse-search-4']
+color = ['chartreuse', 'orange', 'firebrick', 'blue', 'pink', 'green', 'yellow', 'purple', 'gray', 'brown']
+marker = ['^', '*', '.', 'o', '^', '*', '.', 'o', '*', '.']
+# label = ['sse-search-1', 'sse-search-2', 'sse-search-3', 'sse-search-4']
+label = ["sse-search-" + str(i) for i in range(1, 11) ]
 
 plot_line_with_confidence_interval(x, y_time_sse1, color[0], marker[0], label[0])
 plot_line_with_confidence_interval(x, y_time_sse2, color[1], marker[1], label[1])
 plot_line_with_confidence_interval(x, y_time_sse3, color[2], marker[2], label[2])
 plot_line_with_confidence_interval(x, y_time_sse4, color[3], marker[3], label[3])
+plot_line_with_confidence_interval(x, y_time_sse5, color[4], marker[4], label[4])
+plot_line_with_confidence_interval(x, y_time_sse6, color[5], marker[5], label[5])
+plot_line_with_confidence_interval(x, y_time_sse7, color[6], marker[6], label[6])
+plot_line_with_confidence_interval(x, y_time_sse8, color[7], marker[7], label[7])
+plot_line_with_confidence_interval(x, y_time_sse9, color[8], marker[8], label[8])
+plot_line_with_confidence_interval(x, y_time_sse10, color[9], marker[9], label[9])
 
 plt.ylabel('Time (s)')
 plt.xlabel('Number of Lines')
