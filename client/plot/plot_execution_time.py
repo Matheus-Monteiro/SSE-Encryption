@@ -44,7 +44,7 @@ plot_line_with_confidence_interval(x, y_time_sse3, color[2], marker[2], label[2]
 plot_line_with_confidence_interval(x, y_time_sse4, color[3], marker[3], label[3])
 
 plt.ylabel('Time (s)')
-plt.xlabel('Number of Queries')
+plt.xlabel('Number of Lines')
 plt.title('SSE Search Results')
 plt.legend()
 plt.show()
