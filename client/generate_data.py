@@ -54,10 +54,11 @@ if __name__ == '__main__':
     number_of_columns = 10
     number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
 
-    number_of_rounds = 1
+    number_of_rounds = 32
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
+            # table_number = 1
             for size in tqdm(dataset_size):
                 
                 dataset, words = create_dataset(size, number_of_columns, fake)
@@ -66,7 +67,7 @@ if __name__ == '__main__':
                 # write dataset and columns in the datasets directory
                 os.chdir('../datasets/')
                 
-                table_name = 'SSE_sql_test'
+                table_name = 'SSE_sql_test' 
                 connection = sqlite3.connect('Database.db')
                 cursor = connection.cursor()
                 dataset.to_sql(table_name, connection, if_exists='replace', index=False)
@@ -104,6 +105,8 @@ if __name__ == '__main__':
                 dir = '../datasets/'
                 for f in os.listdir(dir):
                     os.remove(os.path.join(dir, f))
+
+                # table_number = table_number + 1
 
             # write data in files
             with open('plot/execution_time.txt', 'a') as f:

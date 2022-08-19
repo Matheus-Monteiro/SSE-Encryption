@@ -6,17 +6,20 @@ from Crypto.Random import random
 import numpy as np
 import time
 import os
+import hashlib
 
 def build_trapdoor(MK, keyword):
-    keyword_index = MD5.new()
-    keyword_index.update(str(keyword).encode())
+    # keyword_index = MD5.new()
+    # keyword_index.update(str(keyword).encode())
+    keyword_index = hashlib.sha256(str(keyword).encode())
     ECB_cipher = AES.new(MK.encode("utf8"), AES.MODE_ECB)
     return ECB_cipher.encrypt(keyword_index.digest())
 
 
 def build_codeword(ID, trapdoor):
-    ID_index = MD5.new()
-    ID_index.update(str(ID).encode())
+    # ID_index = MD5.new()
+    # ID_index.update(str(ID).encode())
+    ID_index = hashlib.sha256(str(ID).encode())
     ECB_cipher = AES.new(trapdoor, AES.MODE_ECB)
     return ECB_cipher.encrypt(ID_index.digest()).hex()
 
@@ -29,7 +32,7 @@ def build_index(MK, ID, keyword_list):
     random.shuffle(secure_index)
     return secure_index
 
-def searchable_encryption(raw_data_file_name, master_key, keyword_type_list, cursor):
+def searchable_encryption(table_name, master_key, keyword_type_list, cursor):
     index_header = []
     for i in range(1, len(keyword_type_list) + 1):
         index_header.append("index_" + str(i))
@@ -86,19 +89,33 @@ if __name__ == "__main__":
     connection = sqlite3.connect(document_name)
     cursor = connection.cursor()
 
+    # table_names = []
+    # for i in range (1, 7):
+    #     tn = "SSE_sql_test" + str(i)
+    #     table_names.append(tn)
+
     table_name = 'SSE_sql_test'
     columns_list = []
     data = cursor.execute("SELECT * from " + table_name + " limit 1")
 
     for column in data.description:
         columns_list.append(column[0])
-    
+
     #keyword_list_file_name = "keywordlist" #input("please input the file stores keyword type:  ")
     #keyword_type_list = open(keyword_list_file_name).read().split(",")
     
     searchable_encryption(table_name, master_key, columns_list, cursor)
 
     # print("Finished")
+
+    # for tn in table_names:
+    #     columns_list = []
+    #     data = cursor.execute("SELECT * from " + tn + " limit 1")
+
+    #     for column in data.description:
+    #         columns_list.append(column[0])
+
+    #     searchable_encryption(tn, master_key, columns_list, cursor)
 
     cursor.close()
     connection.commit()

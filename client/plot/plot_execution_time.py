@@ -43,7 +43,7 @@ y_time_sse10 = get_y__measurements(19)
 color = ['chartreuse', 'orange', 'firebrick', 'blue', 'pink', 'green', 'yellow', 'purple', 'gray', 'brown']
 marker = ['^', '*', '.', 'o', '^', '*', '.', 'o', '*', '.']
 # label = ['sse-search-1', 'sse-search-2', 'sse-search-3', 'sse-search-4']
-label = ["sse-search-" + str(i) for i in range(1, 11) ]
+label = ["sse-search-" + str(i) for i in range(100, 1001, 100) ]
 
 plot_line_with_confidence_interval(x, y_time_sse1, color[0], marker[0], label[0])
 plot_line_with_confidence_interval(x, y_time_sse2, color[1], marker[1], label[1])
@@ -57,8 +57,8 @@ plot_line_with_confidence_interval(x, y_time_sse9, color[8], marker[8], label[8]
 plot_line_with_confidence_interval(x, y_time_sse10, color[9], marker[9], label[9])
 
 plt.ylabel('Time (s)')
-plt.xlabel('Number of Lines')
+plt.xlabel('DB Size')
 plt.title('SSE Search Results')
 plt.legend()
-# plt.show()
-plt.savefig('frida_time' + '.pdf')
+plt.show()
+# plt.savefig('frida_time' + '.pdf')

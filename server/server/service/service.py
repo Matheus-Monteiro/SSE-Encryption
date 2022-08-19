@@ -3,20 +3,23 @@ import pandas as pd
 from Crypto.Cipher import AES
 from Crypto.Hash import MD5
 import os
+import hashlib
 # from memory_profiler import profile
 
 def check_server():
     return 'sucesso :)'
 
 def build_trapdoor(MK, keyword):
-    keyword_index = MD5.new()
-    keyword_index.update(str(keyword).encode())
+    # keyword_index = MD5.new()
+    # keyword_index.update(str(keyword).encode())
+    keyword_index = hashlib.sha256(str(keyword).encode())
     ECB_cipher = AES.new(MK.encode("utf8"), AES.MODE_ECB)
     return ECB_cipher.encrypt(keyword_index.digest())
 
 def build_codeword(ID, trapdoor):
-    ID_index = MD5.new()
-    ID_index.update(str(ID).encode())
+    # ID_index = MD5.new()
+    # ID_index.update(str(ID).encode())
+    ID_index = hashlib.sha256(str(ID).encode())
     ECB_cipher = AES.new(trapdoor, AES.MODE_ECB)
     return ECB_cipher.encrypt(ID_index.digest()).hex()
 
