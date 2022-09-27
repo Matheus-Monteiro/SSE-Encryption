@@ -1,0 +1,9 @@
+Faker
+pandas
+cryptography
+pycryptodome
+flask
+tqdm
+requests
+matplotlib
+psutil

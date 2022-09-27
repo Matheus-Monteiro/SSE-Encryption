@@ -54,7 +54,7 @@ if __name__ == '__main__':
     number_of_columns = 10
     number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
 
-    number_of_rounds = 32
+    number_of_rounds = 1
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
