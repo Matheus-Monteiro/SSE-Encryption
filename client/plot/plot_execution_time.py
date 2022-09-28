@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as st
+from matplotlib.pyplot import figure
+
+# figure(figsize=(9, 8), dpi=100)
 
 with open('execution_time.txt') as f:
     lines = f.readlines()
@@ -40,10 +43,10 @@ y_time_sse8 = get_y__measurements(15)
 y_time_sse9 = get_y__measurements(17)
 y_time_sse10 = get_y__measurements(19)
 
-color = ['chartreuse', 'orange', 'firebrick', 'blue', 'pink', 'green', 'yellow', 'purple', 'gray', 'brown']
+color = ['chartreuse', 'orange', 'firebrick', 'blue', 'pink', 'green', 'darkslategray', 'purple', 'gray', 'brown']
 marker = ['^', '*', '.', 'o', '^', '*', '.', 'o', '*', '.']
 # label = ['sse-search-1', 'sse-search-2', 'sse-search-3', 'sse-search-4']
-label = ["sse-search-" + str(i) for i in range(100, 1001, 100) ]
+label = ["Search-" + str(i) for i in range(100, 1001, 100) ]
 
 plot_line_with_confidence_interval(x, y_time_sse1, color[0], marker[0], label[0])
 plot_line_with_confidence_interval(x, y_time_sse2, color[1], marker[1], label[1])
@@ -59,6 +62,16 @@ plot_line_with_confidence_interval(x, y_time_sse10, color[9], marker[9], label[9
 plt.ylabel('Time (s)')
 plt.xlabel('DB Size')
 plt.title('SSE Search Results')
-plt.legend()
-plt.show()
-# plt.savefig('frida_time' + '.pdf')
+# plt.legend(bbox_to_anchor=(0.87, 1.12), loc='upper left', borderaxespad=0)
+
+ax = plt.gca()
+# ax.set_xlim([xmin, xmax])
+ax.set_ylim([0, 6.5])
+
+
+legend = plt.legend(fontsize='medium', ncol=2,handleheight=2.4, labelspacing=-0.5, columnspacing=2.05, loc='upper center', edgecolor='black')
+legend.get_frame().set_alpha(None)
+legend.get_frame().set_facecolor((0, 0, 1, 0.1))
+
+# plt.show()
+plt.savefig('frida_time' + '.pdf')
