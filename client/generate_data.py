@@ -134,4 +134,4 @@ if __name__ == '__main__':
                     f.write("%s " % y_mem[i])
                 f.write("%s" % '\n')
 
-    cursor.close()
+    # cursor.close()
