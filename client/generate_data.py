@@ -52,9 +52,10 @@ if __name__ == '__main__':
 
     dataset_size = [125, 250, 500, 1000, 2000, 4000]
     number_of_columns = 10
-    number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
+    # number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
+    number_of_queries_per_dataset = [100, 250, 500, 750, 1000]
 
-    number_of_rounds = 1
+    number_of_rounds = 10
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
@@ -102,9 +103,9 @@ if __name__ == '__main__':
                 x.append(size)
                 
                 # erase all generated files in the dataset directory
-                dir = '../datasets/'
-                for f in os.listdir(dir):
-                    os.remove(os.path.join(dir, f))
+                # dir = '../datasets/'
+                # for f in os.listdir(dir):
+                #     os.remove(os.path.join(dir, f))
 
                 # table_number = table_number + 1
 
