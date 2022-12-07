@@ -103,9 +103,9 @@ if __name__ == '__main__':
                 x.append(size)
                 
                 # erase all generated files in the dataset directory
-                # dir = '../datasets/'
-                # for f in os.listdir(dir):
-                #     os.remove(os.path.join(dir, f))
+                dir = '../datasets/'
+                for f in os.listdir(dir):
+                    os.remove(os.path.join(dir, f))
 
                 # table_number = table_number + 1
 
