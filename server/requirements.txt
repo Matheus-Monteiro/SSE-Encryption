@@ -1,3 +1,4 @@
 Faker
 pandas
-cryptography
+pycryptodome
+flask
