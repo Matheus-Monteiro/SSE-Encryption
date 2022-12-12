@@ -18,6 +18,7 @@ def check():
 @app.route("/search", methods=['GET', 'POST'])
 def search():
     keywords = request.json['keyword']
+    table_name = request.json['table_name']
 
     # print(10 * "#")
     # print(keywords)
@@ -30,4 +31,4 @@ def search():
     
     # return response
     
-    return get_index_of(keywords)
+    return get_index_of(keywords, table_name)

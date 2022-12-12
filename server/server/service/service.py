@@ -52,7 +52,7 @@ def search_index(table_name, trapdoor, cursor, columns_list):
     return search_result
 
 # @profile
-def get_index_of(keywords):
+def get_index_of(keywords, table_name):
     keyword = ""
     for w in keywords:
         keyword = keyword + str(w)
@@ -63,7 +63,6 @@ def get_index_of(keywords):
     
     os.chdir('../datasets/')
 
-    table_name = 'SSE_sql_test_index'
     document_name = "Database.db" #name of the database to be encrypted
     connection = sqlite3.connect(document_name)
     cursor = connection.cursor()
