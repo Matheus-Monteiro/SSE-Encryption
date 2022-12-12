@@ -7,6 +7,7 @@ import numpy as np
 import time
 import os
 import hashlib
+import sys
 
 def build_trapdoor(MK, keyword):
     # keyword_index = MD5.new()
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     #     tn = "SSE_sql_test" + str(i)
     #     table_names.append(tn)
 
-    table_name = 'SSE_sql_test'
+    table_name = sys.argv[1]
     columns_list = []
     data = cursor.execute("SELECT * from " + table_name + " limit 1")
 

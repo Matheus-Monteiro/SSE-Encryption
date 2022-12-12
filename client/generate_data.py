@@ -21,7 +21,21 @@ def create_dataset(num_of_rows, number_of_columns, faker):
             line.append(name)
             words.append(name)
         dataset.append(line)
-    return pd.DataFrame(dataset), pd.unique(words).tolist()
+
+    dataset = pd.DataFrame(dataset)
+    words = pd.DataFrame(words)
+
+    cnd, ncold = dataset.columns.values, []
+    for i in range(len(cnd)):
+        ncold.append('column' + str(i))
+    dataset.set_axis(ncold, axis='columns', inplace=True)
+
+    cnw, ncolw = words.columns.values, []
+    for i in range(len(cnw)):
+        ncolw.append('column' + str(i))
+    words.set_axis(ncolw, axis='columns', inplace=True)
+    
+    return dataset, words
 
 def get_search_set(k, words):
     words_search = []
@@ -29,6 +43,23 @@ def get_search_set(k, words):
         idx = randint(0, len(words) - 1)
         words_search.append( words[idx] )
     return words_search
+
+def generated_databases(dataset_size):
+    os.chdir('../datasets/')
+    seed(123)
+    Faker.seed(123)
+    fake = Faker()
+    connection = sqlite3.connect('Database.db')
+    cursor = connection.cursor()
+    for size in dataset_size:
+        table_name_db = 'SSE_sql_test_' + str(size)
+        table_name_word_list = 'SSE_sql_test_word_' + str(size)
+        dataset, words = create_dataset(size, number_of_columns, fake)
+        dataset.to_sql(table_name_db, connection, if_exists='replace', index=False)
+        words.to_sql(table_name_word_list, connection, if_exists='replace', index=False)
+    connection.commit()
+    cursor.close()
+    os.chdir('../client/')
 
 if __name__ == '__main__':
     # erase files
@@ -46,51 +77,29 @@ if __name__ == '__main__':
         pass
 
     # init variables
-    seed(123)
-    Faker.seed(123)
-    fake = Faker()
-
     dataset_size = [125, 250, 500, 1000, 2000, 4000]
     number_of_columns = 10
-    # number_of_queries_per_dataset = [x for x in range(100, 1001, 100)]
     number_of_queries_per_dataset = [100, 250, 500, 750, 1000]
 
-    number_of_rounds = 10
+    # Use the following method to generated an entire dataset and wordlits
+    # generated_databases(dataset_size)
+
+    connection = sqlite3.connect('../datasets/Database.db')
+    cursor = connection.cursor()
+
+    number_of_rounds = 1
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
-            # table_number = 1
             for size in tqdm(dataset_size):
-                
-                dataset, words = create_dataset(size, number_of_columns, fake)
+                table_name_word_list = 'SSE_sql_test_word_' + str(size)
+                cursor.execute('select column0 from ' + table_name_word_list)
+                words =  [item[0] for item in cursor.fetchall()]
                 queries = get_search_set(number_of_queries, words)
 
-                # write dataset and columns in the datasets directory
-                os.chdir('../datasets/')
+                table_name = 'SSE_sql_test_' + str(size) 
+                os.system("python3 build_index.py " + table_name)
                 
-                table_name = 'SSE_sql_test' 
-                connection = sqlite3.connect('Database.db')
-                cursor = connection.cursor()
-                dataset.to_sql(table_name, connection, if_exists='replace', index=False)
-
-                # dataset.to_csv('Database.csv', na_rep='Unkown')
-                # with open(r'keywordlist', 'w') as fp:
-                #    column_names = list(dataset.columns.values.tolist())
-                #    flag = False
-                #    for item in column_names:
-                #        if flag == True:
-                #           fp.write(",%s" % item)
-                #        else:
-                #            fp.write("%s" % item)
-                #        flag = True
-
-                connection.commit()
-                os.chdir('../client/')
-
-                # build index with encrypted data
-                os.system("python3 build_index.py")
-                
-                # run the generated queries
                 start_time = time.time()
                 for i in range(len(queries)):
                     query = {'keyword': queries[i]}
@@ -102,13 +111,6 @@ if __name__ == '__main__':
                 y_time.append(total_time)
                 x.append(size)
                 
-                # erase all generated files in the dataset directory
-                dir = '../datasets/'
-                for f in os.listdir(dir):
-                    os.remove(os.path.join(dir, f))
-
-                # table_number = table_number + 1
-
             # write data in files
             with open('plot/execution_time.txt', 'a') as f:
                 for i in range(len(x)):
@@ -134,4 +136,4 @@ if __name__ == '__main__':
                     f.write("%s " % y_mem[i])
                 f.write("%s" % '\n')
 
-    # cursor.close()
+    cursor.close()
