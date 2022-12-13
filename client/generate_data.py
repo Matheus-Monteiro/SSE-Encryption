@@ -102,7 +102,7 @@ if __name__ == '__main__':
                 
                 start_time = time.time()
                 for i in range(len(queries)):
-                    query = {'keyword': queries[i]}
+                    query = {'keyword': queries[i], 'table_name': table_name}
                     response = requests.get('http://127.0.0.1:5003/search', json=query)
                 total_time = time.time() - start_time
 
@@ -137,3 +137,8 @@ if __name__ == '__main__':
                 f.write("%s" % '\n')
 
     cursor.close()
+    # erase all generated files in the dataset directory
+    dir = '../datasets/'
+    for f in os.listdir(dir):
+        if f != 'Database.db':
+            os.remove(os.path.join(dir, f))

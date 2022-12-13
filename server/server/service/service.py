@@ -57,6 +57,10 @@ def get_index_of(keywords, table_name):
     for w in keywords:
         keyword = keyword + str(w)
     master_key_file_name = "masterkey" #input("Please input the file stored the master key:  ")
+
+    # print('CURRENT DIR:', os.getcwd())
+    # print ("FILE EXISTS:"+str(os.path.exists(master_key_file_name)))
+    
     master_key = open(master_key_file_name).read()
     if len(master_key) > 16:
         master_key = bytes(master_key[:16])
@@ -66,12 +70,9 @@ def get_index_of(keywords, table_name):
     document_name = "Database.db" #name of the database to be encrypted
     connection = sqlite3.connect(document_name)
     cursor = connection.cursor()
-
-    columns_list = []
+    
     data = cursor.execute("SELECT * FROM " + table_name)
-    data_description = list(data.keys())
-    for column in data_description:
-        columns_list.append(column)
+    columns_list = list(map(lambda x: x[0], data.description))
 
     trapdoor_file = open(keyword + "_trapdoor", "wb")
     trapdoor_of_keyword = build_trapdoor(master_key, keyword)
