@@ -87,7 +87,7 @@ if __name__ == '__main__':
     connection = sqlite3.connect('../datasets/Database.db')
     cursor = connection.cursor()
 
-    number_of_rounds = 1
+    number_of_rounds = 10
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
