@@ -87,7 +87,7 @@ if __name__ == '__main__':
     connection = sqlite3.connect('../datasets/Database.db')
     cursor = connection.cursor()
 
-    number_of_rounds = 10
+    number_of_rounds = 1
     for round in range(number_of_rounds):
         for number_of_queries in number_of_queries_per_dataset:
             y_cpu, y_mem, y_time, x = [], [], [], []
@@ -98,7 +98,6 @@ if __name__ == '__main__':
                 queries = get_search_set(number_of_queries, words)
 
                 table_name = 'SSE_sql_test_' + str(size) 
-                os.system("python3 build_index.py " + table_name)
                 
                 start_time = time.time()
                 for i in range(len(queries)):

@@ -23,7 +23,7 @@ def build_codeword(ID, trapdoor):
     ECB_cipher = AES.new(trapdoor, AES.MODE_ECB)
     return ECB_cipher.encrypt(ID_index.digest()).hex()
 
-def search_index(table_name, trapdoor, cursor, columns_list):
+def search_index(table_name, keywords, cursor, columns_list):
     search_result = []
 
     query = "SELECT * from " + table_name
@@ -31,7 +31,6 @@ def search_index(table_name, trapdoor, cursor, columns_list):
 
     size = 1000
     results = result_proxy.fetchmany(size)
-    #results = cursor.fetchall()
 
     from_db = []
     while results:
@@ -41,30 +40,21 @@ def search_index(table_name, trapdoor, cursor, columns_list):
         
         results = result_proxy.fetchmany(size)
 
-    # data_index = pd.read_csv(document)
     data_index = pd.DataFrame(from_db, columns=columns_list)
     data_index = data_index.values
 
     for row in range(data_index.shape[0]):
-        if build_codeword(row, trapdoor) in data_index[row]:
+        flag = False
+        for kw in keywords:
+            if kw in data_index[row]:
+                flag = True
+                break
+        if flag:
             search_result.append(row+1)
 
     return search_result
 
-# @profile
 def get_index_of(keywords, table_name):
-    keyword = ""
-    for w in keywords:
-        keyword = keyword + str(w)
-    master_key_file_name = "masterkey" #input("Please input the file stored the master key:  ")
-
-    # print('CURRENT DIR:', os.getcwd())
-    # print ("FILE EXISTS:"+str(os.path.exists(master_key_file_name)))
-    
-    master_key = open(master_key_file_name).read()
-    if len(master_key) > 16:
-        master_key = bytes(master_key[:16])
-    
     os.chdir('../datasets/')
 
     document_name = "Database.db" #name of the database to be encrypted
@@ -74,15 +64,7 @@ def get_index_of(keywords, table_name):
     data = cursor.execute("SELECT * FROM " + table_name)
     columns_list = list(map(lambda x: x[0], data.description))
 
-    trapdoor_file = open(keyword + "_trapdoor", "wb")
-    trapdoor_of_keyword = build_trapdoor(master_key, keyword)
-    trapdoor_file.write(trapdoor_of_keyword)
-    trapdoor_file.close()
-
-    keyword_trapdoor = keyword + "_trapdoor" #input("Please input the file stored the trapdoor you want to search:  ")
-    with open(keyword_trapdoor, "rb") as f:
-        keyword_trapdoor = f.read()
-    search_result = search_index(table_name, keyword_trapdoor, cursor, columns_list)
+    search_result = search_index(table_name, keywords, cursor, columns_list)
     cursor.close()
 
     os.chdir('../server/')
